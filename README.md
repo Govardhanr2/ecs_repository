@@ -1,0 +1,100 @@
+# ECS WordPress and Microservice Deployment
+
+This project deploys a WordPress website and a Node.js microservice to Amazon ECS using Terraform. The entire infrastructure is defined as code, making it easy to create, update, and manage. The deployment process is automated using GitHub Actions for CI/CD.
+
+## Architecture
+
+The infrastructure consists of the following components:
+
+*   **VPC:** A custom VPC with public and private subnets for network isolation.
+*   **Application Load Balancer (ALB):** An ALB to route traffic to the WordPress and microservice containers.
+*   **ECS (Elastic Container Service):** An ECS cluster to manage the WordPress and microservice containers. The containers are run as Fargate tasks.
+*   **ECR (Elastic Container Registry):** An ECR repository to store the Docker image for the microservice.
+*   **RDS (Relational Database Service):** An RDS MySQL instance for the WordPress database.
+*   **Route 53:** Route 53 is used to manage the domain and create DNS records for the services.
+*   **IAM (Identity and Access Management):** IAM roles and policies are used to grant permissions to the different services and for the CI/CD workflow.
+*   **GitHub Actions:** A GitHub Actions workflow is used to automatically build and push the microservice Docker image to ECR and deploy it to ECS.
+
+## Prerequisites
+
+Before you begin, ensure you have the following:
+
+*   An AWS account with the necessary permissions.
+*   The AWS CLI installed and configured with your credentials.
+*   Terraform installed on your local machine.
+*   Docker installed on your local machine.
+*   A registered domain in Route 53.
+*   A GitHub repository for your project.
+
+## Configuration
+
+1.  Create a file named `terraform.tfvars` in the root of the project.
+2.  Add the following to the file, replacing the values with your own:
+
+    ```terraform
+    aws_region       = "your-aws-region"
+    domain_name      = "your-domain.com"
+    db_username      = "your-db-username"
+    db_password      = "your-db-password"
+    github_org       = "your-github-org"
+    github_repo      = "your-github-repo-name" # e.g., "ecs-repo"
+    aws_account_id   = "your-aws-account-id"
+    ```
+
+3.  In your GitHub repository, go to **Settings > Secrets and variables > Actions** and add the following secrets:
+
+    *   `AWS_ACCOUNT_ID`: Your AWS account ID.
+    *   `AWS_REGION`: The AWS region you are deploying to.
+
+## Deployment
+
+1.  Navigate to the root of the project in your terminal.
+2.  Initialize Terraform:
+    ```bash
+    terraform init
+    ```
+3.  Plan the deployment:
+    ```bash
+    terraform plan
+    ```
+4.  Apply the plan to create the AWS resources:
+    ```bash
+    terraform apply
+    ```
+
+## CI/CD
+
+This project includes a GitHub Actions workflow that automates the build and deployment of the microservice. When you push changes to the `main` branch of your repository, the workflow will:
+
+1.  Build the Docker image for the microservice.
+2.  Push the image to the ECR repository.
+3.  Force a new deployment of the ECS service to pull the new image.
+
+## Accessing the Services
+
+Once the deployment is complete, you can access your services at the following URLs:
+
+*   **WordPress:** `https://wordpress.your-domain.com`
+*   **Microservice:** `https://microservice.your-domain.com`
+
+## WordPress Setup
+
+1.  Open the WordPress URL in your web browser.
+2.  You should be taken directly to the "Site Information" screen. If you are asked for database details, use the values from your `terraform.tfvars` file and the database host from the Terraform output (`terraform output -raw db_instance_address`).
+3.  Fill in the site title, admin username, password, and email address.
+4.  Click "Install WordPress".
+
+## Managing the Infrastructure
+
+You can manage your infrastructure using the following Terraform commands:
+
+*   `terraform plan`: See a plan of changes before applying them.
+*   `terraform apply`: Apply changes to your infrastructure.
+*   `terraform destroy`: Tear down all the resources created by this Terraform configuration. **Use this command with caution.**
+
+## Troubleshooting
+
+*   **"No OpenIDConnect provider found..." error in GitHub Actions:** This means the IAM OIDC provider was not created. Ensure the `aws_iam_openid_connect_provider` resource is in your `modules/security/iam_cicd.tf` file and run `terraform apply` again.
+*   **"Not authorized to perform sts:AssumeRoleWithWebIdentity" error in GitHub Actions:** This is a permissions issue with the IAM role's trust policy. Ensure the `github_org` and `github_repo` values in your `terraform.tfvars` file are correct and that the trust policy in `modules/security/iam_cicd.tf` is correctly configured.
+*   **Microservice not updating after push:** Ensure the GitHub Actions workflow is completing successfully and that the `aws ecs update-service --force-new-deployment` command is being run.
+*   **WordPress database connection error:** Verify that the RDS instance is running and that the security groups are correctly configured to allow traffic from the ECS service.

@@ -1,0 +1,7 @@
+aws_region   = "ap-south-1"
+domain_name  = "testpagespage.space"
+db_username  = "wpadmin"
+db_password  = "aVerySecurePassword123!"
+github_org     = "Govardhanr2"
+github_repo    = "https://github.com/Govardhanr2/ecs-repo.git"
+aws_account_id = "740535718307"
