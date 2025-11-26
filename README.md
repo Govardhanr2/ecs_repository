@@ -92,6 +92,25 @@ You can manage your infrastructure using the following Terraform commands:
 *   `terraform apply`: Apply changes to your infrastructure.
 *   `terraform destroy`: Tear down all the resources created by this Terraform configuration. **Use this command with caution.**
 
+ ## Access Your Services:
+
+Your Terraform deployment has created two services. You can access them at the following URLs:
+
+   * WordPress: https://wordpress.domainname.com
+   * Microservice: https://microservice.domainname.com
+
+Please open these URLs in your web browser to verify that the services are running correctly. The WordPress site may take a few minutes to become available.
+
+  ## Future Updates (CI/CD):
+
+As we've set up the GitHub Actions workflow, any future changes you push to the main branch of your GitHub repository will automatically trigger a new Docker image build and push it to ECR. This will then be deployed to your ECS service.
+
+  To update your microservice:
+   1. Make changes to the microservice/app.js file.
+   2. Commit and push the changes to the main branch of your GitHub repository.
+   3. The GitHub Actions workflow will automatically build and deploy the new version.
+
+
 ## Benefits of this Approach:
 
 * Enhanced Security: Your database credentials are not hardcoded in your Terraform files, task definitions, or Docker images. They are stored centrally and securely in Secrets Manager.
