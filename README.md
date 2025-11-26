@@ -37,13 +37,13 @@ Before you begin, ensure you have the following:
     db_username      = "your-db-username"
     db_password      = "your-db-password"
     github_org       = "your-github-org"
-    github_repo      = "your-github-repo-name" # e.g., "ecs-repo"
+    github_repo      = "your-github-repo-url" # e.g ""https://github.com/xxxx/xxxx.git""
     aws_account_id   = "your-aws-account-id"
     ```
 
 3.  In your GitHub repository, go to **Settings > Secrets and variables > Actions** and add the following secrets:
 
-    *   `AWS_ACCOUNT_ID`: Your AWS account ID.
+    *   `AWS_GIT_ARN`: Your AWS Github Actions Role ARN.
     *   `AWS_REGION`: The AWS region you are deploying to.
 
 ## Deployment
@@ -91,6 +91,19 @@ You can manage your infrastructure using the following Terraform commands:
 *   `terraform plan`: See a plan of changes before applying them.
 *   `terraform apply`: Apply changes to your infrastructure.
 *   `terraform destroy`: Tear down all the resources created by this Terraform configuration. **Use this command with caution.**
+
+## Benefits of this Approach:
+
+* Enhanced Security: Your database credentials are not hardcoded in your Terraform files, task definitions, or Docker images. They are stored centrally and securely in Secrets Manager.
+* Improved Management: You can easily rotate the database credentials in Secrets Manager without needing to update your ECS task definition or redeploy your service.
+* Compliance: Using a dedicated secrets management service like Secrets Manager helps you meet compliance requirements for handling sensitive data.
+  
+## Summary, 
+
+* Installation Requires Database Access: The WordPress installation process involves creating a wp-config.php file with the database credentials and then creating a number of tables in the database (for
+posts, users, settings, etc.). If WordPress could not connect to the RDS database, you would have seen a "Error establishing a database connection" message and would not have been able to proceed with
+the installation.
+* Secrets Manager acts as a secure vault for your database credentials, and your ECS service is granted permission to retrieve them on-demand when the WordPress container starts.
 
 ## Troubleshooting
 
