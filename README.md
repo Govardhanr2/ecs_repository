@@ -126,7 +126,5 @@ the installation.
 
 ## Troubleshooting
 
-*   **"No OpenIDConnect provider found..." error in GitHub Actions:** This means the IAM OIDC provider was not created. Ensure the `aws_iam_openid_connect_provider` resource is in your `modules/security/iam_cicd.tf` file and run `terraform apply` again.
-*   **"Not authorized to perform sts:AssumeRoleWithWebIdentity" error in GitHub Actions:** This is a permissions issue with the IAM role's trust policy. Ensure the `github_org` and `github_repo` values in your `terraform.tfvars` file are correct and that the trust policy in `modules/security/iam_cicd.tf` is correctly configured.
 *   **Microservice not updating after push:** Ensure the GitHub Actions workflow is completing successfully and that the `aws ecs update-service --force-new-deployment` command is being run.
 *   **WordPress database connection error:** Verify that the RDS instance is running and that the security groups are correctly configured to allow traffic from the ECS service.
